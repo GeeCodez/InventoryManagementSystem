@@ -25,7 +25,7 @@ public class DeliveryFrame extends JFrame {
 
     private void initializeUI() {
         setTitle("Delivery Management");
-        setSize(800, 500);
+        setSize(900, 560);
         setLocationRelativeTo(null);
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 
@@ -48,10 +48,11 @@ public class DeliveryFrame extends JFrame {
         refreshButton.addActionListener(event -> loadDeliveries());
 
         JPanel mainPanel = new JPanel(new BorderLayout(12, 12));
-        mainPanel.setBorder(BorderFactory.createEmptyBorder(16, 16, 16, 16));
+        mainPanel.setBorder(BorderFactory.createEmptyBorder(18, 18, 18, 18));
+        mainPanel.setBackground(UITheme.BACKGROUND);
         mainPanel.add(formPanel, BorderLayout.NORTH);
         mainPanel.add(actionsPanel, BorderLayout.CENTER);
-        mainPanel.add(new JScrollPane(table), BorderLayout.SOUTH);
+        mainPanel.add(createTableScrollPane(), BorderLayout.SOUTH);
         setContentPane(mainPanel);
     }
 
@@ -78,4 +79,11 @@ public class DeliveryFrame extends JFrame {
             JOptionPane.showMessageDialog(this, exception.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
         }
     }
+    private JScrollPane createTableScrollPane() {
+        UITheme.styleTable(table);
+        JScrollPane scrollPane = new JScrollPane(table);
+        scrollPane.setBorder(BorderFactory.createLineBorder(new Color(229, 231, 235)));
+        return scrollPane;
+    }
+
 }

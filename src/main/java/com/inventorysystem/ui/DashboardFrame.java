@@ -5,11 +5,14 @@ import com.inventorysystem.services.ProductService;
 import com.inventorysystem.services.SaleService;
 import javax.swing.*;
 import java.awt.*;
+import java.util.LinkedHashMap;
+import java.util.Map;
 
 public class DashboardFrame extends JFrame {
     private final ProductService productService = new ProductService();
     private final OrderService orderService = new OrderService();
     private final SaleService saleService = new SaleService();
+    private final Map<String, JLabel> metricLabels = new LinkedHashMap<>();
 
     public DashboardFrame() {
         initializeUI();
@@ -17,68 +20,113 @@ public class DashboardFrame extends JFrame {
     }
 
     private void initializeUI() {
-        setTitle("Dashboard");
+        setTitle("StockFlow Dashboard");
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        setSize(1000, 650);
+        setSize(1100, 700);
+        setMinimumSize(new Dimension(980, 620));
         setLocationRelativeTo(null);
 
-        JLabel titleLabel = new JLabel("Business Dashboard", SwingConstants.CENTER);
-        titleLabel.setFont(new Font("SansSerif", Font.BOLD, 24));
+        JPanel rootPanel = new JPanel(new BorderLayout());
+        rootPanel.setBackground(UITheme.BACKGROUND);
+        rootPanel.add(createSidebar(), BorderLayout.WEST);
+        rootPanel.add(createMainContent(), BorderLayout.CENTER);
+        setContentPane(rootPanel);
+    }
 
-        JPanel cardsPanel = new JPanel(new GridLayout(1, 4, 12, 12));
-        cardsPanel.setBorder(BorderFactory.createEmptyBorder(10, 0, 10, 0));
-        cardsPanel.add(createCard("Total Products", "0"));
-        cardsPanel.add(createCard("Low Stock", "0"));
-        cardsPanel.add(createCard("Total Sales", "0"));
-        cardsPanel.add(createCard("Pending Orders", "0"));
+    private JPanel createSidebar() {
+        JPanel sidebar = new JPanel();
+        sidebar.setPreferredSize(new Dimension(230, 0));
+        sidebar.setBackground(UITheme.SIDEBAR);
+        sidebar.setBorder(BorderFactory.createEmptyBorder(24, 18, 24, 18));
+        sidebar.setLayout(new BoxLayout(sidebar, BoxLayout.Y_AXIS));
 
-        JPanel buttonsPanel = new JPanel(new GridLayout(2, 2, 12, 12));
-        buttonsPanel.add(createActionButton("Manage Products", () -> new ProductFrame().setVisible(true)));
-        buttonsPanel.add(createActionButton("Manage Orders", () -> new OrderFrame().setVisible(true)));
-        buttonsPanel.add(createActionButton("Manage Deliveries", () -> new DeliveryFrame().setVisible(true)));
-        buttonsPanel.add(createActionButton("Manage Sales", () -> new SaleFrame().setVisible(true)));
+        JLabel brand = new JLabel("StockFlow");
+        brand.setForeground(Color.WHITE);
+        brand.setFont(new Font("SansSerif", Font.BOLD, 24));
+        brand.setAlignmentX(Component.LEFT_ALIGNMENT);
+        JLabel caption = new JLabel("Inventory workspace");
+        caption.setForeground(new Color(203, 213, 225));
+        caption.setAlignmentX(Component.LEFT_ALIGNMENT);
 
-        JButton logoutButton = new JButton("Logout");
-        logoutButton.addActionListener(event -> {
+        sidebar.add(brand);
+        sidebar.add(caption);
+        sidebar.add(Box.createVerticalStrut(32));
+        sidebar.add(navButton("Products", () -> new ProductFrame().setVisible(true)));
+        sidebar.add(navButton("Orders", () -> new OrderFrame().setVisible(true)));
+        sidebar.add(navButton("Deliveries", () -> new DeliveryFrame().setVisible(true)));
+        sidebar.add(navButton("Sales", () -> new SaleFrame().setVisible(true)));
+        sidebar.add(Box.createVerticalGlue());
+        sidebar.add(navButton("Refresh dashboard", this::refreshMetrics));
+        sidebar.add(navButton("Logout", () -> {
             dispose();
             new LoginFrame().setVisible(true);
-        });
+        }));
+        return sidebar;
+    }
 
-        JPanel contentPanel = new JPanel(new BorderLayout(16, 16));
-        contentPanel.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
-        contentPanel.add(titleLabel, BorderLayout.NORTH);
+    private JButton navButton(String title, Runnable action) {
+        JButton button = new JButton(title);
+        button.setAlignmentX(Component.LEFT_ALIGNMENT);
+        button.setMaximumSize(new Dimension(Integer.MAX_VALUE, 42));
+        button.setFocusPainted(false);
+        button.setHorizontalAlignment(SwingConstants.LEFT);
+        button.setBackground(new Color(30, 41, 59));
+        button.setForeground(Color.WHITE);
+        button.addActionListener(event -> action.run());
+        return button;
+    }
+
+    private JPanel createMainContent() {
+        JPanel contentPanel = UITheme.pagePanel();
+
+        JPanel headerPanel = new JPanel(new BorderLayout());
+        headerPanel.setOpaque(false);
+        JPanel headerText = new JPanel();
+        headerText.setOpaque(false);
+        headerText.setLayout(new BoxLayout(headerText, BoxLayout.Y_AXIS));
+        headerText.add(UITheme.title("Business Dashboard"));
+        headerText.add(UITheme.subtitle("Track stock, orders, deliveries and sales from one simple screen."));
+        headerPanel.add(headerText, BorderLayout.WEST);
+
+        JPanel cardsPanel = new JPanel(new GridLayout(1, 4, 16, 16));
+        cardsPanel.setOpaque(false);
+        cardsPanel.add(createMetricCard("Total Products", "0", new Color(37, 99, 235)));
+        cardsPanel.add(createMetricCard("Low Stock", "0", new Color(245, 158, 11)));
+        cardsPanel.add(createMetricCard("Total Sales", "0", new Color(16, 185, 129)));
+        cardsPanel.add(createMetricCard("Pending Orders", "0", new Color(139, 92, 246)));
+
+        JPanel welcomeCard = UITheme.cardPanel();
+        welcomeCard.setLayout(new BorderLayout(8, 8));
+        welcomeCard.add(UITheme.title("Welcome back, admin"), BorderLayout.NORTH);
+        welcomeCard.add(UITheme.subtitle("Use the left menu to manage products, create supplier orders, record deliveries, and sell available stock."), BorderLayout.CENTER);
+
+        contentPanel.add(headerPanel, BorderLayout.NORTH);
         contentPanel.add(cardsPanel, BorderLayout.CENTER);
-        contentPanel.add(buttonsPanel, BorderLayout.SOUTH);
-
-        JPanel bottomPanel = new JPanel(new FlowLayout(FlowLayout.RIGHT));
-        bottomPanel.add(logoutButton);
-        contentPanel.add(bottomPanel, BorderLayout.EAST);
-
-        setContentPane(contentPanel);
+        contentPanel.add(welcomeCard, BorderLayout.SOUTH);
+        return contentPanel;
     }
 
-    private void refreshMetrics() {
-        ((JLabel) ((JPanel) ((JPanel) getContentPane().getComponent(1)).getComponent(0)).getComponent(1)).setText(String.valueOf(productService.getAllProducts().size()));
-        ((JLabel) ((JPanel) ((JPanel) getContentPane().getComponent(1)).getComponent(1)).getComponent(1)).setText(String.valueOf(productService.getLowStockCount()));
-        ((JLabel) ((JPanel) ((JPanel) getContentPane().getComponent(1)).getComponent(2)).getComponent(1)).setText(String.valueOf(saleService.getSalesCount()));
-        ((JLabel) ((JPanel) ((JPanel) getContentPane().getComponent(1)).getComponent(3)).getComponent(1)).setText(String.valueOf(orderService.getPendingOrderCount()));
-    }
-
-    private JPanel createCard(String title, String value) {
-        JPanel card = new JPanel();
-        card.setBorder(BorderFactory.createLineBorder(Color.LIGHT_GRAY));
-        card.setLayout(new BorderLayout());
-        JLabel titleLabel = new JLabel(title, SwingConstants.CENTER);
-        JLabel valueLabel = new JLabel(value, SwingConstants.CENTER);
-        valueLabel.setFont(new Font("SansSerif", Font.BOLD, 24));
+    private JPanel createMetricCard(String title, String value, Color accent) {
+        JPanel card = UITheme.cardPanel();
+        card.setLayout(new BorderLayout(8, 8));
+        JLabel titleLabel = UITheme.subtitle(title);
+        JLabel valueLabel = new JLabel(value);
+        valueLabel.setFont(new Font("SansSerif", Font.BOLD, 34));
+        valueLabel.setForeground(UITheme.TEXT);
+        JPanel accentBar = new JPanel();
+        accentBar.setPreferredSize(new Dimension(5, 0));
+        accentBar.setBackground(accent);
+        card.add(accentBar, BorderLayout.WEST);
         card.add(titleLabel, BorderLayout.NORTH);
         card.add(valueLabel, BorderLayout.CENTER);
+        metricLabels.put(title, valueLabel);
         return card;
     }
 
-    private JButton createActionButton(String title, Runnable action) {
-        JButton button = new JButton(title);
-        button.addActionListener(event -> action.run());
-        return button;
+    private void refreshMetrics() {
+        metricLabels.get("Total Products").setText(String.valueOf(productService.getAllProducts().size()));
+        metricLabels.get("Low Stock").setText(String.valueOf(productService.getLowStockCount()));
+        metricLabels.get("Total Sales").setText(String.valueOf(saleService.getSalesCount()));
+        metricLabels.get("Pending Orders").setText(String.valueOf(orderService.getPendingOrderCount()));
     }
 }

@@ -25,7 +25,7 @@ public class ProductFrame extends JFrame {
 
     private void initializeUI() {
         setTitle("Product Management");
-        setSize(900, 520);
+        setSize(980, 620);
         setLocationRelativeTo(null);
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 
@@ -79,13 +79,14 @@ public class ProductFrame extends JFrame {
         searchField.addActionListener(event -> searchProducts());
 
         JPanel mainPanel = new JPanel(new BorderLayout(12, 12));
-        mainPanel.setBorder(BorderFactory.createEmptyBorder(16, 16, 16, 16));
+        mainPanel.setBorder(BorderFactory.createEmptyBorder(18, 18, 18, 18));
+        mainPanel.setBackground(UITheme.BACKGROUND);
         JPanel topPanel = new JPanel(new BorderLayout(10, 10));
         topPanel.add(formPanel, BorderLayout.NORTH);
         topPanel.add(actionsPanel, BorderLayout.CENTER);
         topPanel.add(searchPanel, BorderLayout.SOUTH);
         mainPanel.add(topPanel, BorderLayout.NORTH);
-        mainPanel.add(new JScrollPane(table), BorderLayout.CENTER);
+        mainPanel.add(createTableScrollPane(), BorderLayout.CENTER);
         setContentPane(mainPanel);
     }
 
@@ -116,22 +117,24 @@ public class ProductFrame extends JFrame {
             JOptionPane.showMessageDialog(this, "Name cannot be empty", "Validation", JOptionPane.WARNING_MESSAGE);
             return;
         }
-        if (!Validator.isValidPrice(Double.parseDouble(priceText))) {
-            JOptionPane.showMessageDialog(this, "Price must be positive", "Validation", JOptionPane.WARNING_MESSAGE);
-            return;
-        }
-        if (!Validator.isValidQuantity(Integer.parseInt(quantityText))) {
-            JOptionPane.showMessageDialog(this, "Quantity cannot be negative", "Validation", JOptionPane.WARNING_MESSAGE);
-            return;
-        }
-
-        Product product = new Product();
-        product.setName(name);
-        product.setCategory(category);
-        product.setPrice(Double.parseDouble(priceText));
-        product.setQuantity(Integer.parseInt(quantityText));
 
         try {
+            double price = Double.parseDouble(priceText);
+            int quantity = Integer.parseInt(quantityText);
+            if (!Validator.isValidPrice(price)) {
+                JOptionPane.showMessageDialog(this, "Price must be positive", "Validation", JOptionPane.WARNING_MESSAGE);
+                return;
+            }
+            if (!Validator.isValidQuantity(quantity)) {
+                JOptionPane.showMessageDialog(this, "Quantity cannot be negative", "Validation", JOptionPane.WARNING_MESSAGE);
+                return;
+            }
+
+            Product product = new Product();
+            product.setName(name);
+            product.setCategory(category.isEmpty() ? "General" : category);
+            product.setPrice(price);
+            product.setQuantity(quantity);
             if (update && selectedProductId > 0) {
                 product.setId(selectedProductId);
                 productService.updateProduct(product);
@@ -142,6 +145,8 @@ public class ProductFrame extends JFrame {
             }
             clearForm();
             loadProducts();
+        } catch (NumberFormatException exception) {
+            JOptionPane.showMessageDialog(this, "Price and quantity must be valid numbers", "Validation", JOptionPane.WARNING_MESSAGE);
         } catch (Exception exception) {
             JOptionPane.showMessageDialog(this, exception.getMessage(), "Error", JOptionPane.ERROR_MESSAGE);
         }
@@ -170,4 +175,11 @@ public class ProductFrame extends JFrame {
         searchField.setText("");
         table.clearSelection();
     }
+    private JScrollPane createTableScrollPane() {
+        UITheme.styleTable(table);
+        JScrollPane scrollPane = new JScrollPane(table);
+        scrollPane.setBorder(BorderFactory.createLineBorder(new Color(229, 231, 235)));
+        return scrollPane;
+    }
+
 }
