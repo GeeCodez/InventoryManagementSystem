@@ -25,7 +25,7 @@ public class OrderFrame extends JFrame {
 
     private void initializeUI() {
         setTitle("Order Management");
-        setSize(900, 520);
+        setSize(980, 620);
         setLocationRelativeTo(null);
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 
@@ -67,10 +67,11 @@ public class OrderFrame extends JFrame {
         refreshButton.addActionListener(event -> loadOrders());
 
         JPanel mainPanel = new JPanel(new BorderLayout(12, 12));
-        mainPanel.setBorder(BorderFactory.createEmptyBorder(16, 16, 16, 16));
+        mainPanel.setBorder(BorderFactory.createEmptyBorder(18, 18, 18, 18));
+        mainPanel.setBackground(UITheme.BACKGROUND);
         mainPanel.add(formPanel, BorderLayout.NORTH);
         mainPanel.add(actionsPanel, BorderLayout.CENTER);
-        mainPanel.add(new JScrollPane(table), BorderLayout.SOUTH);
+        mainPanel.add(createTableScrollPane(), BorderLayout.SOUTH);
         setContentPane(mainPanel);
     }
 
@@ -137,4 +138,11 @@ public class OrderFrame extends JFrame {
         statusComboBox.setSelectedItem("Pending");
         table.clearSelection();
     }
+    private JScrollPane createTableScrollPane() {
+        UITheme.styleTable(table);
+        JScrollPane scrollPane = new JScrollPane(table);
+        scrollPane.setBorder(BorderFactory.createLineBorder(new Color(229, 231, 235)));
+        return scrollPane;
+    }
+
 }

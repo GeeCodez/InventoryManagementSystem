@@ -13,48 +13,84 @@ public class LoginFrame extends JFrame {
     }
 
     private void initializeUI() {
-        setTitle("Inventory System Login");
+        setTitle("StockFlow Login");
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        setSize(420, 300);
+        setSize(900, 560);
+        setMinimumSize(new Dimension(760, 480));
         setLocationRelativeTo(null);
-        setLayout(new GridBagLayout());
 
-        JLabel titleLabel = new JLabel("Inventory Management System", SwingConstants.CENTER);
-        titleLabel.setFont(new Font("SansSerif", Font.BOLD, 20));
+        JPanel root = new JPanel(new GridLayout(1, 2));
+        root.setBackground(UITheme.BACKGROUND);
+        root.add(createHeroPanel());
+        root.add(createLoginPanel());
+        setContentPane(root);
+        setVisible(true);
+    }
 
-        JTextField usernameField = new JTextField(15);
-        JPasswordField passwordField = new JPasswordField(15);
-        JButton loginButton = new JButton("Login");
+    private JPanel createHeroPanel() {
+        JPanel hero = new JPanel(new GridBagLayout());
+        hero.setBackground(UITheme.SIDEBAR);
+        hero.setBorder(BorderFactory.createEmptyBorder(40, 40, 40, 40));
+        JPanel text = new JPanel();
+        text.setOpaque(false);
+        text.setLayout(new BoxLayout(text, BoxLayout.Y_AXIS));
+        JLabel brand = new JLabel("StockFlow");
+        brand.setForeground(Color.WHITE);
+        brand.setFont(new Font("SansSerif", Font.BOLD, 38));
+        JLabel message = new JLabel("Simple inventory management for small businesses.");
+        message.setForeground(new Color(203, 213, 225));
+        message.setFont(new Font("SansSerif", Font.PLAIN, 16));
+        text.add(brand);
+        text.add(Box.createVerticalStrut(12));
+        text.add(message);
+        hero.add(text);
+        return hero;
+    }
+
+    private JPanel createLoginPanel() {
+        JPanel wrapper = new JPanel(new GridBagLayout());
+        wrapper.setBackground(UITheme.BACKGROUND);
+        JPanel card = UITheme.cardPanel();
+        card.setLayout(new GridBagLayout());
+        card.setPreferredSize(new Dimension(330, 330));
+
+        JTextField usernameField = new JTextField("admin", 18);
+        JPasswordField passwordField = new JPasswordField("admin123", 18);
+        JButton loginButton = UITheme.primaryButton("Login");
 
         GridBagConstraints constraints = new GridBagConstraints();
         constraints.insets = new Insets(8, 8, 8, 8);
+        constraints.fill = GridBagConstraints.HORIZONTAL;
         constraints.gridx = 0;
         constraints.gridy = 0;
-        add(titleLabel, constraints);
+        card.add(UITheme.title("Welcome back"), constraints);
+        constraints.gridy++;
+        card.add(UITheme.subtitle("Sign in with the default student project account."), constraints);
+        constraints.gridy++;
+        card.add(new JLabel("Username"), constraints);
+        constraints.gridy++;
+        card.add(usernameField, constraints);
+        constraints.gridy++;
+        card.add(new JLabel("Password"), constraints);
+        constraints.gridy++;
+        card.add(passwordField, constraints);
+        constraints.gridy++;
+        card.add(loginButton, constraints);
 
-        constraints.gridy = 1;
-        add(new JLabel("Username"), constraints);
-        constraints.gridy = 2;
-        add(usernameField, constraints);
-        constraints.gridy = 3;
-        add(new JLabel("Password"), constraints);
-        constraints.gridy = 4;
-        add(passwordField, constraints);
-        constraints.gridy = 5;
-        add(loginButton, constraints);
+        loginButton.addActionListener(event -> login(usernameField, passwordField));
+        passwordField.addActionListener(event -> login(usernameField, passwordField));
+        wrapper.add(card);
+        return wrapper;
+    }
 
-        loginButton.addActionListener(event -> {
-            String username = usernameField.getText().trim();
-            String password = new String(passwordField.getPassword());
-            if (loginService.authenticate(username, password)) {
-                JOptionPane.showMessageDialog(this, "Login successful");
-                dispose();
-                new DashboardFrame().setVisible(true);
-            } else {
-                JOptionPane.showMessageDialog(this, "Invalid credentials", "Error", JOptionPane.ERROR_MESSAGE);
-            }
-        });
-
-        setVisible(true);
+    private void login(JTextField usernameField, JPasswordField passwordField) {
+        String username = usernameField.getText().trim();
+        String password = new String(passwordField.getPassword());
+        if (loginService.authenticate(username, password)) {
+            dispose();
+            new DashboardFrame().setVisible(true);
+        } else {
+            JOptionPane.showMessageDialog(this, "Invalid credentials", "Error", JOptionPane.ERROR_MESSAGE);
+        }
     }
 }
