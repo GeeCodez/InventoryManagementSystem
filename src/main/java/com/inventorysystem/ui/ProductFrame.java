@@ -1,13 +1,26 @@
 package com.inventorysystem.ui;
 
+import java.awt.BorderLayout;
+import java.awt.Color;
+import java.awt.FlowLayout;
+import java.awt.GridLayout;
+
+import javax.swing.BorderFactory;
+import javax.swing.JButton;
+import javax.swing.JLabel;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.JTable;
+import javax.swing.JTextField;
+import javax.swing.ListSelectionModel;
+import javax.swing.table.DefaultTableModel;
+
 import com.inventorysystem.models.Product;
 import com.inventorysystem.services.ProductService;
 import com.inventorysystem.utils.Validator;
-import javax.swing.*;
-import javax.swing.table.DefaultTableModel;
-import java.awt.*;
 
-public class ProductFrame extends JFrame {
+public class ProductFrame extends JPanel {
     private final ProductService productService = new ProductService();
     private final JTable table = new JTable();
     private final JTextField nameField = new JTextField();
@@ -24,10 +37,8 @@ public class ProductFrame extends JFrame {
     }
 
     private void initializeUI() {
-        setTitle("Product Management");
-        setSize(980, 620);
-        setLocationRelativeTo(null);
-        setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+        setLayout(new BorderLayout(12, 12));
+        setBackground(UITheme.BACKGROUND);
 
         JPanel formPanel = new JPanel(new GridLayout(5, 2, 8, 8));
         formPanel.setBorder(BorderFactory.createTitledBorder("Product Details"));
@@ -87,7 +98,7 @@ public class ProductFrame extends JFrame {
         topPanel.add(searchPanel, BorderLayout.SOUTH);
         mainPanel.add(topPanel, BorderLayout.NORTH);
         mainPanel.add(createTableScrollPane(), BorderLayout.CENTER);
-        setContentPane(mainPanel);
+        add(mainPanel, BorderLayout.CENTER);
     }
 
     private void loadProducts() {

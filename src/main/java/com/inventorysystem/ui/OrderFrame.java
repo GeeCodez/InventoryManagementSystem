@@ -1,15 +1,29 @@
 package com.inventorysystem.ui;
 
+import java.awt.BorderLayout;
+import java.awt.Color;
+import java.awt.FlowLayout;
+import java.awt.GridLayout;
+import java.time.LocalDate;
+
+import javax.swing.BorderFactory;
+import javax.swing.JButton;
+import javax.swing.JComboBox;
+import javax.swing.JLabel;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.JTable;
+import javax.swing.JTextField;
+import javax.swing.ListSelectionModel;
+import javax.swing.table.DefaultTableModel;
+
 import com.inventorysystem.models.Order;
 import com.inventorysystem.models.Product;
 import com.inventorysystem.services.OrderService;
 import com.inventorysystem.services.ProductService;
-import javax.swing.*;
-import javax.swing.table.DefaultTableModel;
-import java.awt.*;
-import java.time.LocalDate;
 
-public class OrderFrame extends JFrame {
+public class OrderFrame extends JPanel {
     private final OrderService orderService = new OrderService();
     private final ProductService productService = new ProductService();
     private final JTable table = new JTable();
@@ -24,10 +38,8 @@ public class OrderFrame extends JFrame {
     }
 
     private void initializeUI() {
-        setTitle("Order Management");
-        setSize(980, 620);
-        setLocationRelativeTo(null);
-        setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+        setLayout(new BorderLayout(12, 12));
+        setBackground(UITheme.BACKGROUND);
 
         JPanel formPanel = new JPanel(new GridLayout(4, 2, 8, 8));
         formPanel.setBorder(BorderFactory.createTitledBorder("Order Details"));
@@ -72,7 +84,7 @@ public class OrderFrame extends JFrame {
         mainPanel.add(formPanel, BorderLayout.NORTH);
         mainPanel.add(actionsPanel, BorderLayout.CENTER);
         mainPanel.add(createTableScrollPane(), BorderLayout.SOUTH);
-        setContentPane(mainPanel);
+        add(mainPanel, BorderLayout.CENTER);
     }
 
     private void loadOrders() {

@@ -77,6 +77,16 @@ public class DBConnection {
                 VALUES ('admin', 'admin123')
                 """;
 
+        String insertDemoProducts = """
+                INSERT OR IGNORE INTO products (name, category, price, quantity)
+                VALUES
+                    ('Wireless Mouse', 'Electronics', 24.99, 18),
+                    ('Mechanical Keyboard', 'Electronics', 89.50, 7),
+                    ('Notebook', 'Office', 3.25, 42),
+                    ('Ergonomic Chair', 'Furniture', 159.99, 5),
+                    ('USB-C Cable', 'Accessories', 12.00, 30)
+                """;
+
         try (Connection connection = getConnection(); Statement statement = connection.createStatement()) {
             statement.execute(createUsers);
             statement.execute(createProducts);
@@ -85,6 +95,9 @@ public class DBConnection {
             statement.execute(createDeliveries);
             try (PreparedStatement preparedStatement = connection.prepareStatement(insertAdmin)) {
                 preparedStatement.executeUpdate();
+            }
+            try (PreparedStatement productStatement = connection.prepareStatement(insertDemoProducts)) {
+                productStatement.executeUpdate();
             }
         } catch (SQLException exception) {
             throw new RuntimeException("Failed to initialize database", exception);

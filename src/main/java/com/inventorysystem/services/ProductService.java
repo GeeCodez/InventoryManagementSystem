@@ -1,7 +1,5 @@
 package com.inventorysystem.services;
 
-import com.inventorysystem.database.DBConnection;
-import com.inventorysystem.models.Product;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -9,10 +7,14 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.inventorysystem.database.DBConnection;
+import com.inventorysystem.models.Product;
+
 public class ProductService {
     public void addProduct(Product product) {
         String sql = "INSERT INTO products (name, category, price, quantity) VALUES (?, ?, ?, ?)";
-        try (Connection connection = DBConnection.getConnection(); PreparedStatement statement = connection.prepareStatement(sql)) {
+        try (Connection connection = DBConnection.getConnection();
+        PreparedStatement statement = connection.prepareStatement(sql)) {
             statement.setString(1, product.getName());
             statement.setString(2, product.getCategory());
             statement.setDouble(3, product.getPrice());
